@@ -68,15 +68,15 @@ def test_convert_row(test_Converter):
         "Type": "Property",
         "URI": "ex:createdDateTime",
         "Label": "Created Date Time",
-        "Comment": "The date and Time stamp when the document was created.",
+        "Comment": "The date and Time stamp when the Resource was created.",
         "Usage Note": "Should be xsd:dateTime format.",
-        "Domain Includes": "ex:CollegeTranscript",
+        "Domain Includes": "ex:Document",
         "Range Includes": "xsd:dateTime",
     }
     c.convert_row(row)
     assert ("ex", URIRef("https://example.org/terms#")) in c.vocab_rdf.namespaces()
     dtRef = URIRef("https://example.org/terms#createdDateTime")
-    CTRef = URIRef("https://example.org/terms#CollegeTranscript")
+    CTRef = URIRef("https://example.org/terms#Document")
     print(c.vocab_rdf.serialize(format="turtle"))
     assert ((dtRef, RDF.type, RDF.Property)) in c.vocab_rdf
     assert ((dtRef, RDFS.label, Literal("Created Date Time"))) in c.vocab_rdf
@@ -84,7 +84,7 @@ def test_convert_row(test_Converter):
         (
             dtRef,
             RDFS.comment,
-            Literal("The date and Time stamp when the document was created."),
+            Literal("The date and Time stamp when the Resource was created."),
         )
     ) in c.vocab_rdf
     assert (
@@ -110,6 +110,7 @@ def test_read_csv(test_Converter):
         )
     ) in c.vocab_rdf
 
+#  uncomment the method below to write a new expected graph for future tests
 #def test_write_out(test_Converter):
 #    c = test_Converter
 #    c.write_out(output_fn)
@@ -118,5 +119,6 @@ def test_conversion(test_Converter):
     c = test_Converter
     expected_g = Graph()
     expected_g.parse(output_fn)
+    print(c.vocab_rdf.serialize(format="turtle"))
     assert compare.isomorphic(c.vocab_rdf, expected_g)
 

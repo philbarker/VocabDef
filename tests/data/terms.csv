@@ -2,5 +2,5 @@ Type,URI,Label,Comment,Usage Note,Domain Includes,Range Includes
 Ontology,ex:,Test Terms,A test RDF vocabulary.,Used for testing VocabDef,,
 Class,ex:Document,Document,A written resource.,Documents may be in physical or digital media.,,
 Property,ex:createdDateTime,Created Date Time,The date and Time stamp when the Resource was created.,,,xsd:dateTime
-Property,ex:description,Descrption,A short account of the resource.,,,
+Property,ex:description,Description,A short account of the resource.,,,
 Property,ex:author,Author,The organization or person who created the document.,,ex:Document,sdo:Person
