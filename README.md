@@ -1,0 +1,1 @@
+csv2rdf: Creates an RDF/S (+just enough OWL) vocabulary definition file based on a CSV file.

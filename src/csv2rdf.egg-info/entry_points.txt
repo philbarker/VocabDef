@@ -1,0 +1,2 @@
+[console_scripts]
+csv2rdf = csv2rdf.__main__:main
