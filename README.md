@@ -18,6 +18,14 @@ To install dependencies used in development only:
 (venv) $ pip install .[dev] 
 ```
 
+If you like it and want to use it outside of the venv, you can make a local exectable using [pyinstaller](https://pyinstaller.org/en/stable/index.html) (included in the optional development dependencies).
+
+```
+(venv) $ pyinstaller csv2rdf.spec
+```
+
+which will create an executable file in the `dist/` directory that you can copy to wherever you keep your executables.
+
 ## Usage: 
 ```
 $ csv2rdf [-h] [-ns <namespace filename>] [-of <output format>] [-v] <terms filename> [<output file>]
