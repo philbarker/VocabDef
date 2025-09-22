@@ -15,7 +15,7 @@ authors = [{name = "Phil Barker", email="phil.barker@pjjk.co.uk"}]
 classifiers = [
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
-    "Development Status :: 2 - Pre-Alpha",
+    "Development Status :: 4 - Beta",
     "Intended Audience :: Ontologists",
     "Intended Audience :: Information Technology",
     "Natural Language :: English",
