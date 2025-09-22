@@ -1,6 +1,7 @@
 from csv import DictReader
 from rdflib import Graph, URIRef, Literal, Namespace
 from rdflib import RDF, RDFS, OWL, SDO, SKOS
+from re import split
 
 known_keys = [
     "Type",  # maps to rdfs:type,
@@ -13,6 +14,8 @@ known_keys = [
 ]
 
 known_types = ["Property", "Class", "Ontology"]
+
+splitters = ", |; |,|;| \n| |\n|,\n|, \n}"  # chars used to separate multiple entries in a cell.
 
 
 class csv2rdfConverter:
@@ -58,7 +61,7 @@ class csv2rdfConverter:
 
     def write_out(self, fn: str = "", fmt: str = ""):
         """Write the vocabulary terms definition file."""
-        vg = self.vocab_rdf # vocab graph
+        vg = self.vocab_rdf  # vocab graph
         if fmt == "":
             fmt = "turtle"
         if fn:
@@ -104,11 +107,13 @@ class csv2rdfConverter:
         if ("Usage Note" in r.keys()) and (r["Usage Note"] != ""):
             vg.add((term, SKOS.note, Literal(r["Usage Note"])))
         if ("Domain Includes" in r.keys()) and (r["Domain Includes"] != ""):
-            domain = self.process_term(r["Domain Includes"])
-            vg.add((term, SDO.domainIncludes, domain))
+            for domain_str in split(splitters, r["Domain Includes"]):
+                domain = self.process_term(domain_str)
+                vg.add((term, SDO.domainIncludes, domain))
         if ("Range Includes" in r.keys()) and ((r["Range Includes"] != "")):
-            range = self.process_term(r["Range Includes"])
-            vg.add((term, SDO.rangeIncludes, range))
+            for range_str in split(splitters, r["Range Includes"]):
+                range = self.process_term(range_str)
+                vg.add((term, SDO.rangeIncludes, range))
         return
 
     def process_type(self, type_str):

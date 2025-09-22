@@ -1,12 +1,12 @@
 Metadata-Version: 2.4
 Name: csv2rdf
-Version: 0.0.1a1
+Version: 0.1.0b1
 Summary: Creates an RDF/S (+just enough OWL) vocabulary definition file based on a CSV file.
 Author-email: Phil Barker <phil.barker@pjjk.co.uk>
 Keywords: RDF,metadata application profile,SHACL
 Classifier: Programming Language :: Python
 Classifier: Programming Language :: Python :: 3
-Classifier: Development Status :: 2 - Pre-Alpha
+Classifier: Development Status :: 4 - Beta
 Classifier: Intended Audience :: Ontologists
 Classifier: Intended Audience :: Information Technology
 Classifier: Natural Language :: English
