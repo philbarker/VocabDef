@@ -32,7 +32,6 @@ def test_read_namespaces(test_Converter):
     c.read_namespaces(namespaces_fn)
     assert c.namespaces["ex"] == "https://example.org/terms#"
 
-
 def test_check_keys(test_Converter):
     c = test_Converter
 
@@ -46,9 +45,8 @@ def test_check_keys(test_Converter):
         "Range Includes",  # maps to sdo.rangeIncludes
         "Wrong un",
     ]
-    with pytest.raises(ValueError) as e:
+    with pytest.warns(UserWarning, match="Cannot convert column Wrong un to RDF term."):
         c.check_keys(keys)
-    assert str(e.value) == "Cannot convert Wrong un to RDF term."
 
     keys = []
     with pytest.raises(ValueError) as e:
