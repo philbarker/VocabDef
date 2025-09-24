@@ -5,6 +5,14 @@ build-backend = "setuptools.build_meta"
 [tool.setuptools.dynamic]
 version = {attr = "csv2rdf._version.__version__"}
 
+# pyproject.toml
+[tool.pytest.ini_options]
+minversion = "6.2"
+testpaths = [
+    "tests",
+]
+filterwarnings = 'ignore:Cannot convert column'
+
 [project]
 name = "csv2rdf"
 dynamic = ["version"]

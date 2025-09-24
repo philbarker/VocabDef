@@ -2,6 +2,7 @@ from csv import DictReader
 from rdflib import Graph, URIRef, Literal, Namespace
 from rdflib import RDF, RDFS, OWL, SDO, SKOS
 from re import split
+from warnings import warn
 
 known_keys = [
     "Type",  # maps to rdfs:type,
@@ -89,8 +90,8 @@ class csv2rdfConverter:
             if f in known_keys:
                 pass
             else:
-                msg = f"Cannot convert {f} to RDF term."
-                raise ValueError(msg)
+                msg = f"Cannot convert column {f} to RDF term."
+                warn(msg)
         return
 
     def convert_row(self, r: dict):
