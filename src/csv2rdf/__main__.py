@@ -4,7 +4,6 @@ from csv2rdf import csv2rdfConverter, parse_arguments, __version__
 
 def main():
     args = parse_arguments()
-    print(args.termsCSV_fn)
     c = csv2rdfConverter()
     c.read_namespaces(args.namespace_fn)
     c.read_csv(args.termsCSV_fn)
@@ -12,5 +11,4 @@ def main():
 
 
 if __name__ == "__main__":
-    print(__version__)
     main()
