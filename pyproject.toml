@@ -31,6 +31,7 @@ classifiers = [
 keywords = ["RDF", "metadata application profile", "SHACL"]
 dependencies = [
     "rdflib >=7.0.0",
+    "otsrdflib >= 0.5"
 ]
 requires-python = ">=3.12"
 
