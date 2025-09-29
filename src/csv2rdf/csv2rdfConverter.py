@@ -97,25 +97,32 @@ class csv2rdfConverter:
 
     def convert_row(self, r: dict):
         vg = self.vocab_rdf
-        type = self.process_type(r["Type"])
-        term = self.process_term(r["URI"])
+        type = self.process_type(r["Type"].strip())
+        term = self.process_term(r["URI"].strip())
         vg.add((term, RDF.type, type))
         # for now will just process RDF/S Properties and Classes.
         # To do: different processing for different types.
-        if ("Label" in r.keys()) and (r["Label"] != ""):
-            vg.add((term, RDFS.label, Literal(r["Label"])))
-        if ("Comment" in r.keys()) and (r["Comment"] != ""):
-            vg.add((term, RDFS.comment, Literal(r["Comment"])))
-        if ("Usage Note" in r.keys()) and (r["Usage Note"] != ""):
-            vg.add((term, SKOS.note, Literal(r["Usage Note"])))
-        if ("Domain Includes" in r.keys()) and (r["Domain Includes"] != ""):
-            for domain_str in split(splitters, r["Domain Includes"]):
-                domain = self.process_term(domain_str)
-                vg.add((term, SDO.domainIncludes, domain))
-        if ("Range Includes" in r.keys()) and ((r["Range Includes"] != "")):
-            for range_str in split(splitters, r["Range Includes"]):
-                range = self.process_term(range_str)
-                vg.add((term, SDO.rangeIncludes, range))
+        if ("Label" in r.keys()) and (r["Label"].strip() != ""):
+            label = r["Label"].strip()
+            vg.add((term, RDFS.label, Literal(label)))
+        if ("Comment" in r.keys()) and (r["Comment"].strip() != ""):
+            comment = r["Comment"].strip()
+            vg.add((term, RDFS.comment, Literal(comment)))
+        if ("Usage Note" in r.keys()) and (r["Usage Note"].strip() != ""):
+            usage = r["Usage Note"].strip()
+            vg.add((term, SKOS.note, Literal(usage)))
+        if ("Domain Includes" in r.keys()) and (r["Domain Includes"].strip() != ""):
+            domainList = r["Domain Includes"].strip()
+            for domain_str in split(splitters, domainList):
+                if domain_str.strip() != "":
+                    domain = self.process_term(domain_str.strip())
+                    vg.add((term, SDO.domainIncludes, domain))
+        if ("Range Includes" in r.keys()) and ((r["Range Includes"].strip() != "")):
+            rangeList = r["Range Includes"].strip()
+            for range_str in split(splitters, rangeList):
+                if  range_str.strip() != "":
+                    range = self.process_term(range_str.strip())
+                    vg.add((term, SDO.rangeIncludes, range))
         return
 
     def process_type(self, type_str):
@@ -149,5 +156,5 @@ class csv2rdfConverter:
             msg = f"Prefix {prefix} does not correspond to a known namespace."
             raise ValueError(msg)
         # then add the term URI to the graph
-        term = URIRef(ns_uriref + name)
+        term = URIRef(ns_uriref + name.strip())
         return term

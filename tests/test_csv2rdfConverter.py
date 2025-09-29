@@ -74,7 +74,7 @@ def test_convert_row(test_Converter):
         "Label": "Created Date Time",
         "Comment": "The date and Time stamp when the Resource was created.",
         "Usage Note": "Should be xsd:dateTime format.",
-        "Domain Includes": "ex:Document, ex:File",
+        "Domain Includes": "ex:Document, ex:File ",
         "Range Includes": "xsd:dateTime",
     }
     c.convert_row(row)
