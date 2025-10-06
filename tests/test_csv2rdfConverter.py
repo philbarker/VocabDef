@@ -11,22 +11,22 @@ skos_csv_fn = "tests/data/concepts.csv"
 skos_output_fn = "tests/data/concepts.ttl"
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="function")
 def test_Converter():
     converter = csv2rdfConverter()
     return converter
 
 
 @pytest.fixture(scope="module")
-def example_Converter():
+def rdfs_Converter():
     converter = csv2rdfConverter()
     return converter
 
 
 @pytest.fixture(scope="module")
 def skos_converter():
-    skos_converter = csv2rdfConverter()
-    return skos_converter
+    converter = csv2rdfConverter()
+    return converter
 
 
 def test_init(test_Converter):
@@ -93,6 +93,8 @@ def test_check_keys(test_Converter):
 
 def test_convert_row(test_Converter):
     c = test_Converter
+    c.add_namespace("ex", "https://example.org/terms#")
+    c.add_namespace("xsd", "http://www.w3.org/2001/XMLSchema#")
     row = {"Type": "Property", "URI": "p:createdDateTime"}
     with pytest.raises(ValueError) as e:
         c.convert_row(row)
@@ -128,8 +130,8 @@ def test_convert_row(test_Converter):
     assert ((dtRef, SDO.rangeIncludes, XSD.dateTime)) in c.vocab_rdf
 
 
-def test_read_csv(example_Converter):
-    c = example_Converter
+def test_read_csv(rdfs_Converter):
+    c = rdfs_Converter
     c.read_namespaces(namespaces_fn)
     c.read_csv(input_csv_fn)
     ontRef = URIRef("https://example.org/terms#")
@@ -156,8 +158,8 @@ def test_read_skos_csv(skos_converter):
 #    c.write_out(output_fn)
 
 
-def test_conversion(example_Converter):
-    c = example_Converter
+def test_conversion(rdfs_Converter):
+    c = rdfs_Converter
     expected_g = Graph()
     expected_g.parse(output_fn)
     print(c.vocab_rdf.serialize(format="turtle"))
