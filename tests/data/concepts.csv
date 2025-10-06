@@ -1,0 +1,8 @@
+Type,URI,Label,Definition,Notation,Related term,Relationship
+Concept Scheme,ex:colours,Colours,An example concept scheme for some colours.,,"ex:red
+ex:green
+ex:blue",hasTopConcept
+Concept,ex:red,Red,The primary colour wavelength 625–750nm.,"r, FF0000",,
+Concept,ex:green,Green,The primary colour wavelength 500-565nm.,"g, 00FF00",,
+Concept,ex:blue,Blue,The primary colour wavelength 450-485nm.,"b, 0000FF",,
+Concept,ex:pink,Pink,A lighter shade of red.,660000,ex:red,broader
