@@ -7,6 +7,8 @@ from rdflib import compare
 namespaces_fn = "tests/data/namespaces.csv"
 input_csv_fn = "tests/data/terms.csv"
 output_fn = "tests/data/terms.ttl"
+skos_csv_fn = "tests/data/concepts.csv"
+skos_output_fn = "tests/data/concepts.ttl"
 
 
 @pytest.fixture(scope="module")
@@ -21,6 +23,12 @@ def example_Converter():
     return converter
 
 
+@pytest.fixture(scope="module")
+def skos_converter():
+    skos_converter = csv2rdfConverter()
+    return skos_converter
+
+
 def test_init(test_Converter):
     c = test_Converter
     g = Graph()
@@ -31,6 +39,17 @@ def test_read_namespaces(test_Converter):
     c = test_Converter
     c.read_namespaces(namespaces_fn)
     assert c.namespaces["ex"] == "https://example.org/terms#"
+
+
+def test_process_type(test_Converter):
+    c = test_Converter
+    assert c.process_type("Concept") == SKOS.Concept
+    assert c.process_type("Property") == RDF.Property
+    assert c.process_type("Class") == RDFS.Class
+    with pytest.raises(ValueError) as e:
+        c.process_type("Wrong")
+    assert str(e.value) == "Unknown term type Wrong."
+
 
 def test_check_keys(test_Converter):
     c = test_Converter
@@ -60,6 +79,16 @@ def test_check_keys(test_Converter):
     with pytest.raises(ValueError) as e:
         c.check_keys(keys)
     assert str(e.value) == "Must have columns for Type and URI in the input csv."
+    keys = [  # these are common keys for SKOS
+        "Type",
+        "URI",
+        "Label",
+        "Definition",
+        "Notation",
+        "Related term",
+        "Relationship",
+    ]
+    assert c.check_keys(keys)
 
 
 def test_convert_row(test_Converter):
@@ -113,6 +142,12 @@ def test_read_csv(example_Converter):
             Literal("A test RDF vocabulary."),
         )
     ) in c.vocab_rdf
+
+
+def test_read_skos_csv(skos_converter):
+    sc = skos_converter
+    sc.read_namespaces(namespaces_fn)
+    sc.read_csv(skos_csv_fn)
 
 
 #  uncomment the method below to write a new expected graph for future tests

@@ -20,7 +20,13 @@ known_keys = [
     "Relationship",  # maps to predicate of a relationship statement
 ]
 
-known_types = ["Property", "Class", "Ontology", "Concept Scheme", "Concept"]
+known_types = {
+    "Property": RDF.Property,
+    "Class": RDFS.Class,
+    "Ontology": OWL.Ontology,
+    "Concept Scheme": SKOS.ConceptScheme,
+    "Concept": SKOS.Concept,
+}
 
 splitters = (
     ", |; |,|;| \n| |\n|,\n|, \n"  # chars used to separate multiple entries in a cell.
@@ -115,7 +121,7 @@ class csv2rdfConverter:
             else:
                 msg = f"Cannot convert column {f} to RDF term."
                 warn(msg, stacklevel=2)
-        return
+        return True
 
     def convert_row(self, r: dict):
         vg = self.vocab_rdf
@@ -148,16 +154,11 @@ class csv2rdfConverter:
         return
 
     def process_type(self, type_str):
-        if type_str == "Property":
-            type = RDF.Property
-        elif type_str == "Class":
-            type = RDFS.Class
-        elif type_str == "Ontology":
-            type = OWL.Ontology
+        if type_str in known_types.keys():
+            return known_types[type_str]
         else:
             msg = f"Unknown term type {type_str}."
             raise ValueError(msg)
-        return type
 
     def process_term(self, cURI):
         try:
