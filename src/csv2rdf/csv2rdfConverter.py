@@ -1,6 +1,6 @@
 from csv import DictReader
 from rdflib import Graph, URIRef, Literal, Namespace
-from rdflib import RDF, RDFS, OWL, SDO, SKOS
+from rdflib import RDF, RDFS, OWL, SDO, SKOS, DCTERMS
 from re import split
 from warnings import warn
 from otsrdflib import OrderedTurtleSerializer
@@ -28,9 +28,17 @@ known_types = {
     "Concept": SKOS.Concept,
 }
 
-splitters = (
-    ", |; |,|;| \n| |\n|,\n|, \n"  # chars used to separate multiple entries in a cell.
-)
+known_relationships = {
+    "hasTopConcept": SKOS.hasTopConcept,
+    "topConceptOf": SKOS.topConceptOf,
+    "inScheme": SKOS.inScheme,
+    "broader": SKOS.broader,
+    "narrower": SKOS.narrower,
+    "broadMatch": SKOS.broadMatch,
+    "narrowMatch": SKOS.narrowMatch,
+}
+
+splitters = "\n|,|;|,\n"  # chars used to separate multiple entries in a cell.
 
 serialization_order = [
     OWL.Ontology,
@@ -128,29 +136,20 @@ class csv2rdfConverter:
         type = self.process_type(r["Type"].strip())
         term = self.process_term(r["URI"].strip())
         vg.add((term, RDF.type, type))
-        # for now will just process RDF/S Properties and Classes.
-        # To do: different processing for different types.
-        if ("Label" in r.keys()) and (r["Label"].strip() != ""):
-            label = r["Label"].strip()
-            vg.add((term, RDFS.label, Literal(label)))
-        if ("Comment" in r.keys()) and (r["Comment"].strip() != ""):
-            comment = r["Comment"].strip()
-            vg.add((term, RDFS.comment, Literal(comment)))
-        if ("Usage Note" in r.keys()) and (r["Usage Note"].strip() != ""):
-            usage = r["Usage Note"].strip()
-            vg.add((term, SKOS.note, Literal(usage)))
-        if ("Domain Includes" in r.keys()) and (r["Domain Includes"].strip() != ""):
-            domainList = r["Domain Includes"].strip()
-            for domain_str in split(splitters, domainList):
-                if domain_str.strip() != "":
-                    domain = self.process_term(domain_str.strip())
-                    vg.add((term, SDO.domainIncludes, domain))
-        if ("Range Includes" in r.keys()) and ((r["Range Includes"].strip() != "")):
-            rangeList = r["Range Includes"].strip()
-            for range_str in split(splitters, rangeList):
-                if range_str.strip() != "":
-                    range = self.process_term(range_str.strip())
-                    vg.add((term, SDO.rangeIncludes, range))
+        if type == OWL.Ontology:
+            self._process_owl_row(r, term, vg)
+        elif type == RDFS.Class:
+            self._process_rdfs_class_row(r, term, vg)
+        elif type == RDF.Property:
+            self._process_rdfs_property_row(r, term, vg)
+        elif type == SKOS.ConceptScheme:
+            self._process_scheme_row(r, term, vg)
+        elif type == SKOS.Concept:
+            self._process_concept_row(r, term, vg)
+        else:
+            # shouldn't really ave got this far
+            msg = f"Unknown term type {type}."
+            raise TypeError(msg)
         return
 
     def process_type(self, type_str):
@@ -181,3 +180,105 @@ class csv2rdfConverter:
         # then add the term URI to the graph
         term = URIRef(ns_uriref + name.strip())
         return term
+
+    def _process_owl_row(self, r: dict, term: URIRef, vg: Graph):
+        if ("Label" in r.keys()) and (r["Label"].strip() != ""):
+            label = r["Label"].strip()
+            vg.add((term, RDFS.label, Literal(label)))
+        if ("Comment" in r.keys()) and (r["Comment"].strip() != ""):
+            comment = r["Comment"].strip()
+            vg.add((term, RDFS.comment, Literal(comment)))
+        if ("Usage Note" in r.keys()) and (r["Usage Note"].strip() != ""):
+            usage = r["Usage Note"].strip()
+            vg.add((term, SKOS.note, Literal(usage)))
+        return
+
+    def _process_rdfs_class_row(self, r: dict, term: URIRef, vg: Graph):
+        if ("Label" in r.keys()) and (r["Label"].strip() != ""):
+            label = r["Label"].strip()
+            vg.add((term, RDFS.label, Literal(label)))
+        if ("Comment" in r.keys()) and (r["Comment"].strip() != ""):
+            comment = r["Comment"].strip()
+            vg.add((term, RDFS.comment, Literal(comment)))
+        if ("Usage Note" in r.keys()) and (r["Usage Note"].strip() != ""):
+            usage = r["Usage Note"].strip()
+            vg.add((term, SKOS.note, Literal(usage)))
+        return
+
+    def _process_rdfs_property_row(self, r: dict, term: URIRef, vg: Graph):
+        if ("Label" in r.keys()) and (r["Label"].strip() != ""):
+            label = r["Label"].strip()
+            vg.add((term, RDFS.label, Literal(label)))
+        if ("Comment" in r.keys()) and (r["Comment"].strip() != ""):
+            comment = r["Comment"].strip()
+            vg.add((term, RDFS.comment, Literal(comment)))
+        if ("Usage Note" in r.keys()) and (r["Usage Note"].strip() != ""):
+            usage = r["Usage Note"].strip()
+            vg.add((term, SKOS.note, Literal(usage)))
+        if ("Domain Includes" in r.keys()) and (r["Domain Includes"].strip() != ""):
+            domainList = r["Domain Includes"].strip()
+            for domain_str in split(splitters, domainList):
+                if domain_str.strip() != "":
+                    domain = self.process_term(domain_str.strip())
+                    vg.add((term, SDO.domainIncludes, domain))
+        if ("Range Includes" in r.keys()) and ((r["Range Includes"].strip() != "")):
+            rangeList = r["Range Includes"].strip()
+            for range_str in split(splitters, rangeList):
+                if range_str.strip() != "":
+                    range = self.process_term(range_str.strip())
+                    vg.add((term, SDO.rangeIncludes, range))
+        return
+
+    def _process_scheme_row(self, r: dict, term: URIRef, vg: Graph):
+        if ("Label" in r.keys()) and (r["Label"].strip() != ""):
+            label = r["Label"].strip()
+            vg.add((term, DCTERMS.title, Literal(label)))
+        if ("Definition" in r.keys()) and (r["Definition"].strip() != ""):
+            definition = r["Definition"].strip()
+            vg.add((term, DCTERMS.description, Literal(definition)))
+        if ("Usage Note" in r.keys()) and (r["Usage Note"].strip() != ""):
+            usage = r["Usage Note"].strip()
+            vg.add((term, SKOS.note, Literal(usage)))
+        if (("Related term") in r.keys()) and (r["Related term"].strip() != ""):
+            for related in split(splitters, r["Related term"].strip()):
+                self._process_related_terms(
+                    r["Relationship"], related.strip(), term, vg
+                )
+        return
+
+    def _process_concept_row(self, r: dict, term: URIRef, vg: Graph):
+        if ("Label" in r.keys()) and (r["Label"].strip() != ""):
+            label = r["Label"].strip()
+            vg.add((term, SKOS.prefLabel, Literal(label)))
+        if ("Definition" in r.keys()) and (r["Definition"].strip() != ""):
+            definition = r["Definition"].strip()
+            vg.add((term, SKOS.definition, Literal(definition)))
+        if ("Notation" in r.keys()) and (r["Notation"].strip() != ""):
+            notation = r["Notation"].strip()
+            vg.add((term, SKOS.notation, Literal(notation)))
+        if (("Related term") in r.keys()) and (r["Related term"].strip() != ""):
+            for related in split(splitters, r["Related term"].strip()):
+                self._process_related_terms(
+                    r["Relationship"], related.strip(), term, vg
+                )
+        return
+
+    def _process_related_terms(
+        self, relationship: str, rel_term: str, termRef: URIRef, vg: Graph
+    ):
+        try:
+            rel_term = rel_term.strip()
+            rel = relationship.strip()
+            print(rel, rel_term)
+        except:
+            msg = f"Must have stringvalues for both term and relationship. Have term = {rel_term} and relationsip = {relationship}."
+            raise ValueError(msg)
+        for r in split(splitters, rel):
+            r = r.strip()
+            if r in known_relationships.keys():
+                rel_termRef = self.process_term(rel_term)
+                relRef = known_relationships[r]
+                vg.add((termRef, relRef, rel_termRef))
+            else:
+                msg = f"Cannot process relationship {r}"
+                raise ValueError(msg)
