@@ -269,7 +269,6 @@ class csv2rdfConverter:
         try:
             rel_term = rel_term.strip()
             rel = relationship.strip()
-            print(rel, rel_term)
         except:
             msg = f"Must have stringvalues for both term and relationship. Have term = {rel_term} and relationsip = {relationship}."
             raise ValueError(msg)
