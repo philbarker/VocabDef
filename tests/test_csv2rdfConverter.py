@@ -90,6 +90,22 @@ def test_check_keys(test_Converter):
     ]
     assert c.check_keys(keys)
 
+def test_process_term(test_Converter):
+    c= test_Converter
+    c.add_namespace("ex", "https://example.org/terms#")
+    cURI = "ex:test"
+    termRef = c.process_term(cURI)
+    assert termRef == URIRef("https://example.org/terms#test")
+    cURI = "ex:"
+    termRef = c.process_term(cURI)
+    assert termRef == URIRef("https://example.org/terms#")
+    cURI = "ex"
+    with pytest.raises(ValueError) as e:
+        termRef = c.process_term(cURI)
+    assert str(e.value) == "ex does not seem to be a curie."
+
+
+
 
 def test_convert_row_rdfs(test_Converter):
     c = test_Converter
@@ -221,3 +237,5 @@ def test_skos_conversion(skos_converter):
     expected_g.parse(skos_output_fn)
     print(c.vocab_rdf.serialize(format="turtle"))
     assert compare.isomorphic(c.vocab_rdf, expected_g)
+
+    

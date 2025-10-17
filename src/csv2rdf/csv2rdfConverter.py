@@ -164,8 +164,8 @@ class csv2rdfConverter:
             (prefix, name) = cURI.split(":")
         except:
             print(cURI)
-            msg = f"{cURI} does not seem to be a curie"
-            raise ValueError
+            msg = f"{cURI} does not seem to be a curie."
+            raise ValueError(msg)
         # first make sure the prefix is known and bound to the vocab graph
         if prefix in self.namespaces:
             ns_uriref = URIRef(self.namespaces[prefix])
