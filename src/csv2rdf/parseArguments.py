@@ -7,6 +7,7 @@ namespace_fn = "namespaces.csv"
 # aboutFileName = "about.csv"
 output_fmt = "turtle"
 
+
 def parse_arguments():
     parser = ArgumentParser(
         prog="csv2rdf.py",
