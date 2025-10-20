@@ -38,7 +38,7 @@ known_relationships = {
     "narrowMatch": SKOS.narrowMatch,
 }
 
-splitters = "\n|,|;|,\n"  # chars used to separate multiple entries in a cell.
+splitters = ",\n|;\n|\n|,|;"  # chars used to separate multiple entries in a cell.
 
 serialization_order = [
     OWL.Ontology,

@@ -90,8 +90,9 @@ def test_check_keys(test_Converter):
     ]
     assert c.check_keys(keys)
 
+
 def test_process_term(test_Converter):
-    c= test_Converter
+    c = test_Converter
     c.add_namespace("ex", "https://example.org/terms#")
     cURI = "ex:test"
     termRef = c.process_term(cURI)
@@ -105,6 +106,39 @@ def test_process_term(test_Converter):
     assert str(e.value) == "ex does not seem to be a curie."
 
 
+def test_process_related_terms(test_Converter):
+    c = test_Converter
+    c.add_namespace("ex", "https://example.org/terms#")
+    relationship = "hasTopConcept"
+    rel_term = "ex:red"
+    termRef = URIRef("https://example.org/terms#")
+    vg = c.vocab_rdf
+    c._process_related_terms(relationship, rel_term, termRef, vg)
+    assert (
+        (
+            URIRef("https://example.org/terms#"),
+            SKOS.hasTopConcept,
+            URIRef("https://example.org/terms#red"),
+        )
+    ) in c.vocab_rdf
+    relationship = "inScheme,topConceptOf"
+    rel_term = "ex:"
+    termRef = URIRef("https://example.org/terms#red")
+    c._process_related_terms(relationship, rel_term, termRef, vg)
+    assert (
+        (
+            URIRef("https://example.org/terms#red"),
+            SKOS.inScheme,
+            URIRef("https://example.org/terms#"),
+        )
+    ) in c.vocab_rdf
+    assert (
+        (
+            URIRef("https://example.org/terms#red"),
+            SKOS.topConceptOf,
+            URIRef("https://example.org/terms#"),
+        )
+    ) in c.vocab_rdf
 
 
 def test_convert_row_rdfs(test_Converter):
@@ -237,5 +271,3 @@ def test_skos_conversion(skos_converter):
     expected_g.parse(skos_output_fn)
     print(c.vocab_rdf.serialize(format="turtle"))
     assert compare.isomorphic(c.vocab_rdf, expected_g)
-
-    
