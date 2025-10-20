@@ -113,7 +113,7 @@ def test_process_related_terms(test_Converter):
     rel_term = "ex:red"
     termRef = URIRef("https://example.org/terms#")
     vg = c.vocab_rdf
-    c._process_related_terms(relationship, rel_term, termRef, vg)
+    c._process_related_terms(relationship, rel_term, termRef)
     assert (
         (
             URIRef("https://example.org/terms#"),
@@ -124,7 +124,7 @@ def test_process_related_terms(test_Converter):
     relationship = "inScheme,topConceptOf"
     rel_term = "ex:"
     termRef = URIRef("https://example.org/terms#red")
-    c._process_related_terms(relationship, rel_term, termRef, vg)
+    c._process_related_terms(relationship, rel_term, termRef)
     assert (
         (
             URIRef("https://example.org/terms#red"),

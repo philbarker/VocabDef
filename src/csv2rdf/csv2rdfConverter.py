@@ -137,15 +137,15 @@ class csv2rdfConverter:
         term = self.process_term(r["URI"].strip())
         vg.add((term, RDF.type, type))
         if type == OWL.Ontology:
-            self._process_owl_row(r, term, vg)
+            self._process_owl_row(r, term)
         elif type == RDFS.Class:
-            self._process_rdfs_class_row(r, term, vg)
+            self._process_rdfs_class_row(r, term)
         elif type == RDF.Property:
-            self._process_rdfs_property_row(r, term, vg)
+            self._process_rdfs_property_row(r, term)
         elif type == SKOS.ConceptScheme:
-            self._process_scheme_row(r, term, vg)
+            self._process_scheme_row(r, term)
         elif type == SKOS.Concept:
-            self._process_concept_row(r, term, vg)
+            self._process_concept_row(r, term)
         else:
             # shouldn't really ave got this far
             msg = f"Unknown term type {type}."
@@ -181,7 +181,8 @@ class csv2rdfConverter:
         term = URIRef(ns_uriref + name.strip())
         return term
 
-    def _process_owl_row(self, r: dict, term: URIRef, vg: Graph):
+    def _process_owl_row(self, r: dict, term: URIRef):
+        vg = self.vocab_rdf
         if ("Label" in r.keys()) and (r["Label"].strip() != ""):
             label = r["Label"].strip()
             vg.add((term, RDFS.label, Literal(label)))
@@ -193,7 +194,8 @@ class csv2rdfConverter:
             vg.add((term, SKOS.note, Literal(usage)))
         return
 
-    def _process_rdfs_class_row(self, r: dict, term: URIRef, vg: Graph):
+    def _process_rdfs_class_row(self, r: dict, term: URIRef):
+        vg = self.vocab_rdf
         if ("Label" in r.keys()) and (r["Label"].strip() != ""):
             label = r["Label"].strip()
             vg.add((term, RDFS.label, Literal(label)))
@@ -205,7 +207,8 @@ class csv2rdfConverter:
             vg.add((term, SKOS.note, Literal(usage)))
         return
 
-    def _process_rdfs_property_row(self, r: dict, term: URIRef, vg: Graph):
+    def _process_rdfs_property_row(self, r: dict, term: URIRef):
+        vg = self.vocab_rdf
         if ("Label" in r.keys()) and (r["Label"].strip() != ""):
             label = r["Label"].strip()
             vg.add((term, RDFS.label, Literal(label)))
@@ -229,7 +232,8 @@ class csv2rdfConverter:
                     vg.add((term, SDO.rangeIncludes, range))
         return
 
-    def _process_scheme_row(self, r: dict, term: URIRef, vg: Graph):
+    def _process_scheme_row(self, r: dict, term: URIRef):
+        vg = self.vocab_rdf
         if ("Label" in r.keys()) and (r["Label"].strip() != ""):
             label = r["Label"].strip()
             vg.add((term, DCTERMS.title, Literal(label)))
@@ -242,11 +246,12 @@ class csv2rdfConverter:
         if (("Related term") in r.keys()) and (r["Related term"].strip() != ""):
             for related in split(splitters, r["Related term"].strip()):
                 self._process_related_terms(
-                    r["Relationship"], related.strip(), term, vg
+                    r["Relationship"], related.strip(), term
                 )
         return
 
-    def _process_concept_row(self, r: dict, term: URIRef, vg: Graph):
+    def _process_concept_row(self, r: dict, term: URIRef):
+        vg = self.vocab_rdf
         if ("Label" in r.keys()) and (r["Label"].strip() != ""):
             label = r["Label"].strip()
             vg.add((term, SKOS.prefLabel, Literal(label)))
@@ -259,13 +264,14 @@ class csv2rdfConverter:
         if (("Related term") in r.keys()) and (r["Related term"].strip() != ""):
             for related in split(splitters, r["Related term"].strip()):
                 self._process_related_terms(
-                    r["Relationship"], related.strip(), term, vg
+                    r["Relationship"], related.strip(), term
                 )
         return
 
     def _process_related_terms(
-        self, relationship: str, rel_term: str, termRef: URIRef, vg: Graph
+        self, relationship: str, rel_term: str, termRef: URIRef
     ):
+        vg = self.vocab_rdf
         try:
             rel_term = rel_term.strip()
             rel = relationship.strip()
